@@ -1,6 +1,7 @@
 """ 
-    Python2
     Michel Victor
+
+    OBS: EXECUTE com Python2
 """
 
 import threading
