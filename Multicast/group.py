@@ -1,46 +1,24 @@
-# UDP multicast examples, Hugo Vincent, 2005-05-14.
-import socket
+import custom_sockt as cs
 
-import threading
+try:
+  cs.send(cs.load_file())
+  while True:
+    data, sender_addr = cs.recv()
+    
+    try:
+      name_file, file = data.decode().split("|")
 
-def send(data, port=50000, addr='224.0.0.1'):
-  """send(data[, port[, addr]]) - multicasts a UDP datagram."""
-  # Create the socket
-  s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-  # Make the socket multicast-aware, and set TTL.
-  s.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 20) # Change TTL (=20) to suit
-  # Send the data
-  s.sendto(data, (addr, port))
+      if name_file == 'public.key':
+        with open(sender_addr[0]+'_public.key', 'wb') as public_key:
+          public_key.write(file.encode())
+          public_key.close()
+        
+        print(sender_addr[0]+'_public.key has been successfully saved!')
+    except ValueError:
+        print(data)
+      
 
-def recv(port=50000, addr='224.0.0.1', buf_size=1024):
- 
-  # Create the socket
-  s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+except KeyboardInterrupt:
+  cs.send('Disconnect!'.encode())
+  pass
 
-  # Set some options to make it multicast-friendly
-  try:
-    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
-  except AttributeError:
-    pass # Some systems don't support SO_REUSEPORT
-
-  # Bind to the port
-  s.bind(("", port))
-
-  # Set some more multicast options
-  intf = socket.gethostbyname(socket.gethostname())
-
-  s.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, socket.inet_aton(addr) + socket.inet_aton(intf))
-  s.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_LOOP, 0)
-
-# Receive the data, then unregister multicast receive membership, then close the port
-
-  data, sender_addr = s.recvfrom(buf_size)
-
-  # s.setsockopt(socket.IPPROTO_IP, socket.IP_DROP_MEMBERSHIP, socket.inet_aton(addr) + socket.inet_aton('0.0.0.0'))
-  s.close()
-  return data
-
-str1 = input('seu nome: ')
-send(str1.encode())
-while True:
-  print(recv().decode()+ ' disse oi')

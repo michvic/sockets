@@ -8,10 +8,10 @@ def generate_RSA(bits=2048):
 
 key_priv, key_pub = generate_RSA()
 
-with open('private.key', 'wb') as key:
-  key.write(key_priv)
-  key.close()
+with open('private.key', 'wb') as private_key:
+  private_key.write(key_priv)
+  private_key.close()
 
-with open('public.key', 'wb') as key:
-  key.write(key_pub)
-  key.close()
+with open('public.key', 'wb') as public_key:
+  public_key.write(key_pub)
+  public_key.close()
