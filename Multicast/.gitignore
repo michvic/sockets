@@ -1,4 +1,6 @@
 public.key
 private.key
+keys/*
+*.txt
 *_public.key
 __pycache__
